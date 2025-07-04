@@ -8,16 +8,10 @@ on:
     paths:
       - "**"
       - "!**.md"
-      - "!.github/workflows/cron_build.yml"
-      - "!.github/workflows/cron.yml"
       - "!.github/workflows/docker.yml"
       - "!.github/workflows/repository_dispatch.yml"
       - "!tools/config_editor/**"
       - "!tools/docker/**"
-
-concurrency:
-  group: esp-idf-libs-${{github.event.pull_request.number || github.ref}}
-  cancel-in-progress: true
 
 jobs:
   build-libs:
@@ -25,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        target: [esp32, esp32s2, esp32s3, esp32c2, esp32c3, esp32c6, esp32h2, esp32p4]
+        target: [esp32s3]
       fail-fast: false
     steps:
     - name: Checkout repository
@@ -35,7 +29,7 @@ jobs:
       run: bash ./tools/prepare-ci.sh
 
     - name: Build Libs for ${{ matrix.target }}
-      run: bash ./build.sh -e -t ${{ matrix.target }}
+      run: bash ./build.sh -e -t ${{ matrix.target }} -A release/v2.x -I release/v4.4
 
     - name: Upload build
       if: failure()
